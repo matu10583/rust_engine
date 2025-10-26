@@ -1,0 +1,23 @@
+[package]
+name = "rust_engine"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "rust_engine"
+path = "src/lib.rs"
+[[bin]]
+name = "sandbox"
+path = "src/bin/sandbox.rs"
+[features]
+default = ["ecs-hecs"]
+ecs-hecs = ["dep:hecs"]
+ecs-custom = []
+
+[dependencies]
+hecs = { version = "0.10", optional = true }
+glam = "0.27"
+winit = "0.28"
+log = "0.4"
+env_logger = "0.11"
+thiserror = "1"
