@@ -1,7 +1,7 @@
+use crate::core::ecs;
 use crate::core::plugin::Plugin;
 use crate::core::schedule::{Schedule, Stage};
-use crate::ecs;
-use crate::{DiContainer, Time, TimeState};
+use crate::core::{DiContainer, Time, TimeFixed, TimeState};
 
 pub struct App {
     // App implementation
@@ -16,6 +16,7 @@ impl App {
     pub fn new() -> Self {
         let mut dicontainer = DiContainer::new();
         dicontainer.insert(Time::default());
+        dicontainer.insert(TimeFixed::new(1.0 / 60.0)); // 固定更新用の時間間隔を追加
         Self {
             dicontainer: dicontainer,
             world: ecs::World::new(),
@@ -25,6 +26,11 @@ impl App {
         }
     }
 
+    pub fn set_fixed_dt(&mut self, dt: f32) {
+        if let Some(fixed_time) = self.dicontainer.get_mut::<TimeFixed>() {
+            fixed_time.delta_seconds = dt;
+        }
+    }
     pub fn add_system(
         &mut self,
         stage: Stage,
@@ -34,8 +40,27 @@ impl App {
         self
     }
 
+    pub fn get_di_container(&mut self) -> &mut DiContainer {
+        &mut self.dicontainer
+    }
+
     pub fn add_plugin<P: Plugin>(&mut self, plugin: &P) -> &mut Self {
         plugin.build(self);
+        self
+    }
+
+    pub fn add_event<T: 'static + Send + Sync>(
+        &mut self,
+        event: crate::core::events::Events<T>,
+    ) -> &mut Self {
+        fn update_event<T: 'static + Send + Sync>(di: &mut DiContainer, _world: &mut ecs::World) {
+            if let Some(events) = di.get_mut::<crate::core::events::Events<T>>() {
+                events.update();
+            }
+        }
+        self.dicontainer.insert(event);
+        self.schedule
+            .add_system(Stage::LateUpdate, update_event::<T>);
         self
     }
 
@@ -48,18 +73,38 @@ impl App {
         self.run_startup = true;
     }
 
-    pub fn update(&mut self) {
+    pub fn tick_timer(&mut self) {
         let t = self.timer_state.tick();
 
         if let Some(time) = self.dicontainer.get_mut::<Time>() {
             *time = t;
         }
+    }
 
+    pub fn process_input(&mut self) {
+        self.schedule
+            .run_stage(Stage::ProcessInput, &mut self.dicontainer, &mut self.world);
+    }
+
+    pub fn update_logic(&mut self) {
         self.schedule
             .run_stage(Stage::Update, &mut self.dicontainer, &mut self.world);
+    }
+
+    pub fn render(&mut self, _alpha: f32) {
+        // レンダリングロジック（必要に応じて実装）
         self.schedule
             .run_stage(Stage::Render, &mut self.dicontainer, &mut self.world);
+    }
+
+    pub fn late_update(&mut self) {
         self.schedule
             .run_stage(Stage::LateUpdate, &mut self.dicontainer, &mut self.world);
+    }
+
+    pub fn fixed_update(&mut self) {
+        // 固定更新ロジック（必要に応じて実装）
+        self.schedule
+            .run_stage(Stage::FixedUpdate, &mut self.dicontainer, &mut self.world);
     }
 }

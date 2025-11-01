@@ -1,12 +1,14 @@
-pub use crate::ecs;
-pub use crate::{DiContainer, Events, Time, TimeState};
+pub use crate::core::ecs;
+pub use crate::core::{DiContainer, Events, Time, TimeState};
 
 #[derive(PartialEq, Eq, Hash, Clone, Copy)]
 pub enum Stage {
     Startup,
+    ProcessInput,
     Update,
     LateUpdate,
     Render,
+    FixedUpdate,
 }
 
 type System = fn(&mut DiContainer, &mut ecs::World);
@@ -15,6 +17,8 @@ pub struct Schedule {
     update: Vec<System>,
     late_update: Vec<System>,
     render: Vec<System>,
+    fixed_update: Vec<System>,
+    process_input: Vec<System>,
 }
 
 impl Schedule {
@@ -24,6 +28,8 @@ impl Schedule {
             update: vec![],
             late_update: vec![],
             render: vec![],
+            fixed_update: vec![],
+            process_input: vec![],
         }
     }
 
@@ -33,6 +39,8 @@ impl Schedule {
             Stage::Update => &mut self.update,
             Stage::LateUpdate => &mut self.late_update,
             Stage::Render => &mut self.render,
+            Stage::FixedUpdate => &mut self.fixed_update,
+            Stage::ProcessInput => &mut self.process_input,
         };
         v.push(system);
         self
@@ -44,6 +52,8 @@ impl Schedule {
             Stage::Update => &mut self.update,
             Stage::LateUpdate => &mut self.late_update,
             Stage::Render => &mut self.render,
+            Stage::FixedUpdate => &mut self.fixed_update,
+            Stage::ProcessInput => &mut self.process_input,
         };
         for system in v.iter().copied() {
             system(di, world);

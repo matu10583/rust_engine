@@ -40,3 +40,12 @@ impl TimeState {
         self.time.clone()
     }
 }
+
+pub struct TimeFixed {
+    pub delta_seconds: f32,
+}
+impl TimeFixed {
+    pub fn new(dt: f32) -> Self {
+        Self { delta_seconds: dt }
+    }
+}
