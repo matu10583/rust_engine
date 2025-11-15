@@ -106,6 +106,8 @@ impl App {
     pub fn render(&mut self, _alpha: f32) {
         // レンダリングロジック（必要に応じて実装）
         self.schedule
+            .run_stage(Stage::PreRender, &mut self.dicontainer, &mut self.world);
+        self.schedule
             .run_stage(Stage::Render, &mut self.dicontainer, &mut self.world);
     }
 
