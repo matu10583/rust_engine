@@ -76,13 +76,12 @@ impl Input {
     }
 }
 
-
 #[cfg(test)]
 mod tests {
     use super::*;
     use crate::core::events::Events;
-    use crate::events::KeyboardInputEvent;
     use crate::core::input::EngineElementState;
+    use crate::events::KeyboardInputEvent;
 
     #[test]
     fn input_press_release_and_clear() {

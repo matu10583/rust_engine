@@ -65,9 +65,25 @@ impl Plugin for InputPlugin {
             // 他のイベント処理は同様のパターンで追加
         }
         app.get_di_container().insert(Input::new());
-        app.add_system(Stage::ProcessInput, input_system);
-        app.add_event(crate::core::events::Events::<KeyboardInputEvent>::new());
-        app.add_event(crate::core::events::Events::<MouseInputEvent>::new());
-        app.add_event(crate::core::events::Events::<CursorMovedEvent>::new());
+        app.add_system(
+            Stage::ProcessInput,
+            crate::core::schedule::Priority::High,
+            input_system,
+        );
+        app.add_event(
+            crate::core::events::Events::<KeyboardInputEvent>::new(),
+            Stage::LateUpdate,
+            crate::core::schedule::Priority::Normal,
+        );
+        app.add_event(
+            crate::core::events::Events::<MouseInputEvent>::new(),
+            Stage::LateUpdate,
+            crate::core::schedule::Priority::Normal,
+        );
+        app.add_event(
+            crate::core::events::Events::<CursorMovedEvent>::new(),
+            Stage::LateUpdate,
+            crate::core::schedule::Priority::Normal,
+        );
     }
 }

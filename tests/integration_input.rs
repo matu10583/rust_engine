@@ -1,7 +1,7 @@
 use rust_engine::core::app::App;
+use rust_engine::core::input::{EngineElementState, EngineKey, EngineMouseButton};
+use rust_engine::events::{CursorMovedEvent, KeyboardInputEvent, MouseInputEvent};
 use rust_engine::InputPlugin;
-use rust_engine::events::{KeyboardInputEvent, MouseInputEvent, CursorMovedEvent};
-use rust_engine::core::input::{EngineKey, EngineElementState, EngineMouseButton};
 
 fn setup_app() -> App {
     let mut app = App::new();
@@ -100,7 +100,11 @@ fn integration_lost_focus_clears_state() {
 
     // Press some keys and buttons
     send_keyboard_event(&mut app, EngineKey::A, EngineElementState::Pressed);
-    send_mouse_event(&mut app, EngineMouseButton::Right, EngineElementState::Pressed);
+    send_mouse_event(
+        &mut app,
+        EngineMouseButton::Right,
+        EngineElementState::Pressed,
+    );
     app.late_update();
     app.process_input();
 
@@ -125,4 +129,3 @@ fn integration_lost_focus_clears_state() {
         assert!(!input.is_mouse_button_down(EngineMouseButton::Right));
     }
 }
-

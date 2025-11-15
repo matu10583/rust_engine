@@ -1,2 +1,2 @@
-pub mod input;
-pub use input::InputPlugin;
+pub mod system;
+pub use system::InputPlugin;

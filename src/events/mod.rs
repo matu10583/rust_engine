@@ -1,2 +1,2 @@
-pub mod input;
-pub use input::{CursorMovedEvent, KeyboardInputEvent, MouseInputEvent};
+pub mod system;
+pub use system::{CursorMovedEvent, KeyboardInputEvent, MouseInputEvent};

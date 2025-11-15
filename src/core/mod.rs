@@ -3,8 +3,6 @@ pub mod plugin;
 pub mod schedule;
 pub use app::App;
 pub use plugin::Plugin;
-pub mod render;
-pub use render::NullRenderer;
 pub use schedule::{Schedule, Stage};
 pub mod input;
 pub use input::Input;

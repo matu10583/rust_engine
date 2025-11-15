@@ -1,0 +1,61 @@
+#[derive(Debug, Clone)]
+pub struct SpriteHandle {
+    id: u32,
+}
+#[derive(Debug, Clone)]
+pub struct Sprite {
+    handle: SpriteHandle,
+    tint: [f32; 4],
+    pivot: glam::Vec2,
+    visible: bool,
+}
+
+impl SpriteHandle {
+    pub fn new(id: u32) -> Self {
+        Self { id }
+    }
+    /// SpriteHandle の識別子を取得します。
+    pub fn id(&self) -> u32 {
+        self.id
+    }
+}
+
+impl Sprite {
+    pub fn new(handle: SpriteHandle) -> Self {
+        Self {
+            handle,
+            tint: [1.0, 1.0, 1.0, 1.0],
+            pivot: glam::Vec2::new(0.5, 0.5),
+            visible: true,
+        }
+    }
+
+    /// このスプライトが保持するハンドルへの参照を返します。
+    pub fn handle(&self) -> &SpriteHandle {
+        &self.handle
+    }
+
+    pub fn set_tint(&mut self, tint: [f32; 4]) {
+        self.tint = tint;
+    }
+
+    pub fn get_tint(&self) -> [f32; 4] {
+        self.tint
+    }
+
+    pub fn set_pivot(&mut self, pivot: glam::Vec2) {
+        self.pivot = pivot;
+    }
+
+    pub fn get_pivot(&self) -> glam::Vec2 {
+        self.pivot
+    }
+
+    pub fn set_visible(&mut self, visible: bool) {
+        self.visible = visible;
+    }
+
+    pub fn is_visible(&self) -> bool {
+        self.visible
+    }
+}

@@ -31,12 +31,14 @@ impl App {
             fixed_time.delta_seconds = dt;
         }
     }
-    pub fn add_system(
+    /// 指定した優先度でスケジュールにシステムを登録します。
+    pub fn add_system<I: Into<usize>>(
         &mut self,
         stage: Stage,
+        priority: I,
         system: fn(&mut DiContainer, &mut ecs::World),
     ) -> &mut Self {
-        self.schedule.add_system(stage, system);
+        self.schedule.add_system(stage, priority, system);
         self
     }
 
@@ -44,14 +46,24 @@ impl App {
         &mut self.dicontainer
     }
 
+    pub fn get_world(&mut self) -> &mut ecs::World {
+        &mut self.world
+    }
+
     pub fn add_plugin<P: Plugin>(&mut self, plugin: &P) -> &mut Self {
         plugin.build(self);
         self
     }
 
-    pub fn add_event<T: 'static + Send + Sync>(
+    /// Register an Events<T> resource and add an `update()` system into the
+    /// given `update_stage` at the default priority (0).
+    /// `Events<T>` リソースを登録し、その `update()` を指定した `update_stage` と
+    /// 優先度で実行するシステムとして登録します。優先度インデックスが小さいほど先に実行されます。
+    pub fn add_event<T: 'static + Send + Sync, I: Into<usize>>(
         &mut self,
         event: crate::core::events::Events<T>,
+        update_stage: Stage,
+        priority: I,
     ) -> &mut Self {
         fn update_event<T: 'static + Send + Sync>(di: &mut DiContainer, _world: &mut ecs::World) {
             if let Some(events) = di.get_mut::<crate::core::events::Events<T>>() {
@@ -60,7 +72,7 @@ impl App {
         }
         self.dicontainer.insert(event);
         self.schedule
-            .add_system(Stage::LateUpdate, update_event::<T>);
+            .add_system(update_stage, priority, update_event::<T>);
         self
     }
 
