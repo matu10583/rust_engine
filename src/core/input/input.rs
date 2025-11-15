@@ -41,7 +41,7 @@ impl Input {
     }
 
     pub fn press_key(&mut self, key: EngineKey) {
-        if (self.is_key_down(key)) {
+        if self.is_key_down(key) {
             return;
         }
         self.keys_pressed.insert(key);
@@ -52,7 +52,7 @@ impl Input {
     }
 
     pub fn press_mouse_button(&mut self, button: EngineMouseButton) {
-        if (self.is_mouse_button_down(button)) {
+        if self.is_mouse_button_down(button) {
             return;
         }
         self.mouse_button_pressed.insert(button);
@@ -73,5 +73,68 @@ impl Input {
         self.keys_pressed.clear();
         self.mouse_button_down.clear();
         self.mouse_button_pressed.clear();
+    }
+}
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::core::events::Events;
+    use crate::events::KeyboardInputEvent;
+    use crate::core::input::EngineElementState;
+
+    #[test]
+    fn input_press_release_and_clear() {
+        let mut input = Input::new();
+        assert!(!input.is_key_down(EngineKey::A));
+        assert!(!input.is_key_pressed(EngineKey::A));
+
+        input.press_key(EngineKey::A);
+        assert!(input.is_key_down(EngineKey::A));
+        assert!(input.is_key_pressed(EngineKey::A));
+
+        // clear_frame should clear the 'pressed' set but keep 'down'
+        input.clear_frame();
+        assert!(input.is_key_down(EngineKey::A));
+        assert!(!input.is_key_pressed(EngineKey::A));
+
+        // release should remove from 'down'
+        input.release_key(EngineKey::A);
+        assert!(!input.is_key_down(EngineKey::A));
+    }
+
+    #[test]
+    fn events_double_buffer_and_apply_to_input_like_plugin() {
+        // Events queue behavior: sends are visible only after update()
+        let mut evts: Events<KeyboardInputEvent> = Events::new();
+        let evt = KeyboardInputEvent {
+            key: EngineKey::A,
+            state: EngineElementState::Pressed,
+        };
+
+        evts.send(evt);
+        // Not yet visible on the read side
+        assert!(evts.is_empty());
+
+        // Flip buffers so sent events become readable
+        evts.update();
+        assert_eq!(evts.len(), 1);
+
+        // Drain and apply to an Input instance (mimic InputPlugin behavior)
+        let mut input = Input::new();
+        for e in evts.drain() {
+            if e.state == EngineElementState::Pressed {
+                input.press_key(e.key);
+            } else {
+                input.release_key(e.key);
+            }
+        }
+
+        assert!(input.is_key_down(EngineKey::A));
+        assert!(input.is_key_pressed(EngineKey::A));
+
+        // After draining, the buffer should be empty
+        assert_eq!(evts.len(), 0);
     }
 }

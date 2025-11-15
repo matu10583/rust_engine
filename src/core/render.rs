@@ -2,6 +2,7 @@ use crate::core::app::App;
 use crate::core::plugin::Plugin;
 use crate::core::schedule::Stage;
 
+#[allow(dead_code)]
 trait Renderer {
     fn start_frame(&mut self, app: &mut App);
     fn end_frame(&mut self, app: &mut App);

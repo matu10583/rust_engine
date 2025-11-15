@@ -1,5 +1,3 @@
-use winit::event::Event;
-
 use crate::core::app::App;
 use crate::core::events::Events;
 use crate::core::input::Input;
