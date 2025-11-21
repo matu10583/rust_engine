@@ -1,10 +1,6 @@
 use crate::core::TextureHandle;
 
 #[derive(Debug, Clone)]
-pub struct SpriteHandle {
-    id: u32,
-}
-#[derive(Debug, Clone)]
 pub struct Sprite {
     handle: TextureHandle,
     tint: [f32; 4],
