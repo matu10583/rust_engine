@@ -6,9 +6,7 @@ edition = "2021"
 [lib]
 name = "rust_engine"
 path = "src/lib.rs"
-[[bin]]
-name = "sandbox"
-path = "src/bin/sandbox.rs"
+
 [features]
 default = ["ecs-hecs"]
 ecs-hecs = ["dep:hecs"]

@@ -1,27 +1,19 @@
+use crate::core::TextureHandle;
+
 #[derive(Debug, Clone)]
 pub struct SpriteHandle {
     id: u32,
 }
 #[derive(Debug, Clone)]
 pub struct Sprite {
-    handle: SpriteHandle,
+    handle: TextureHandle,
     tint: [f32; 4],
     pivot: glam::Vec2,
     visible: bool,
 }
 
-impl SpriteHandle {
-    pub fn new(id: u32) -> Self {
-        Self { id }
-    }
-    /// SpriteHandle の識別子を取得します。
-    pub fn id(&self) -> u32 {
-        self.id
-    }
-}
-
 impl Sprite {
-    pub fn new(handle: SpriteHandle) -> Self {
+    pub fn new(handle: TextureHandle) -> Self {
         Self {
             handle,
             tint: [1.0, 1.0, 1.0, 1.0],
@@ -31,7 +23,7 @@ impl Sprite {
     }
 
     /// このスプライトが保持するハンドルへの参照を返します。
-    pub fn handle(&self) -> &SpriteHandle {
+    pub fn handle(&self) -> &TextureHandle {
         &self.handle
     }
 

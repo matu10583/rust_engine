@@ -2,7 +2,7 @@ use crate::components::Sprite;
 use crate::components::Transform2D;
 use crate::core::app::App;
 use crate::core::plugin::Plugin;
-use crate::core::schedule::{Stage, Priority};
+use crate::core::schedule::{Priority, Stage};
 use crate::events::system::{RenderCommand, RenderQueue};
 pub struct Render2D {}
 
@@ -14,21 +14,9 @@ impl Render2D {
 
 impl Plugin for Render2D {
     fn build(&self, app: &mut App) {
-        app.add_event(
-            RenderQueue::new(),
-            Stage::PreRender,
-            Priority::Normal,
-        );
-        app.add_system(
-            Stage::LateUpdate,
-            Priority::Low,
-            collect_and_send_system,
-        );
-        app.add_system(
-            Stage::Render,
-            Priority::Normal,
-            render_system,
-        );
+        app.add_event(RenderQueue::new(), Stage::PreRender, Priority::Normal);
+        app.add_system(Stage::LateUpdate, Priority::Low, collect_and_send_system);
+        app.add_system(Stage::Render, Priority::Normal, render_system);
     }
 }
 
