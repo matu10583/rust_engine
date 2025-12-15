@@ -1,3 +1,7 @@
+---
+trigger: always_on
+---
+
 # プロジェクト
 
 rust_engine — 学習優先の Rust 製 2D エンジン基盤
@@ -7,6 +11,7 @@ rust_engine — 学習優先の Rust 製 2D エンジン基盤
 - 最優先は学習。ユーザーが次から単独でコーディングができるように最強プログラマに育ててください。明確な指示がない限り自動生成や巨大なスキャフォールドは厳禁。
 - コードはユーザーが主に書く。支援は最小でレビューしやすい提案に留める。
 - スコープは 2D 先行・3D へ拡張可能。プロダクション要件は二の次。
+- MMORPGの制作に使えるようなエンジンを目指す。
 
 ## 主要アーキテクチャ（現状の合意）
 
@@ -47,24 +52,8 @@ rust_engine — 学習優先の Rust 製 2D エンジン基盤
 - time: Time, TimeState。
 - core: schedule::Stage/System/Schedule, plugin::Plugin, app::App。
 
-## 次の推奨マイルストーン
-
-1. プラットフォームランナー（winit）：run_startup_once → 毎ループ run_frame。ESC/Close で終了。
-2. NullRenderer プラグイン：Render に no-op を追加。
-3. 入力リソース（キーボード/マウス）＋簡単な移動サンプル。
-4. 2D コンポーネント（Transform/Transform2D シュガー、Camera2D、Sprite ハンドル）。
-5. アセット管理設計（ECS はハンドル、実体は DiContainer のマネージャ）。
-
 ## コーディングスタイル
 
 - Rust 2021+の慣用表現。小さなモジュール。POD には Debug/Clone/Copy を付与。
 - lib.rs で明示的に再エクスポートして外向き API を整頓。
 - 関数は短く単一責務。過度な一般化は避ける。
-
-## レビュー・チェックリスト（Copilot 向け）
-
-- hecs 隠蔽とファサード設計を守っているか？
-- DiContainer の可変借用がスコープで適切に分離されているか？
-- Events のフラッシュ（update）が LateUpdate 等で行われているか？
-- ステージ順序と決定的実行が担保されているか？
-- サンプルは最小でコンパイル可能か？

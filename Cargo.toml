@@ -8,9 +8,10 @@ name = "rust_engine"
 path = "src/lib.rs"
 
 [features]
-default = ["ecs-hecs"]
+default = ["ecs-hecs", "image"]
 ecs-hecs = ["dep:hecs"]
 ecs-custom = []
+image = ["dep:image"]
 
 [dependencies]
 hecs = { version = "0.10", optional = true }
@@ -19,3 +20,6 @@ winit = "0.28"
 log = "0.4"
 env_logger = "0.11"
 thiserror = "1"
+image = { version = "0.24", optional = true }
+toml = "0.5.5"
+serde = { version = "1.0.104", features = ["derive"] }

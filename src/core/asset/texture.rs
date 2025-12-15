@@ -1,4 +1,8 @@
+use crate::core::config::Config;
+use image::GenericImageView;
 use std::collections::HashMap;
+use std::sync::Arc;
+
 type TextureId = u32;
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct TextureHandle {
@@ -36,39 +40,51 @@ pub struct TextureManager {
     textures: HashMap<TextureId, TextureData>,
     path_cache: HashMap<String, TextureHandle>,
     next_id: TextureId,
+    config: Arc<Config>,
 }
 
 impl TextureManager {
-    pub fn new() -> Self {
+    pub fn new(config: Arc<Config>) -> Self {
         Self {
             textures: HashMap::new(),
             path_cache: HashMap::new(),
             next_id: 1,
+            config: config,
         }
     }
 
-    pub fn load(&mut self, path: &str) -> TextureHandle {
+    pub fn load(&mut self, path: &str) -> Result<TextureHandle, String> {
         if let Some(handle) = self.path_cache.get(path) {
-            return *handle;
+            return Ok(*handle);
         }
         let id = self.next_id;
         self.next_id += 1;
-        let data = self._load_impl(path);
+        let full_path = self.config.get_texture_dir().unwrap() + path;
+        let data = self._load_impl(&full_path)?;
         self.textures.insert(id, data);
         let handle = TextureHandle { id };
         self.path_cache.insert(path.to_string(), handle);
-        handle
+        Ok(handle)
     }
 
-    fn _load_impl(&mut self, _path: &str) -> TextureData {
+    fn _load_impl(&mut self, _path: &str) -> Result<TextureData, String> {
         // ここで実際のファイル読み込みとデコードを行う
-        // 仮の実装として、固定サイズとフォーマットのテクスチャを返す
-        TextureData {
-            width: 256,
-            height: 256,
-            format: TextureFormat::Rgba8,
-            data: vec![255; 256 * 256 * 4], // 白いテクスチャ
-        }
+        let img = match image::open(_path) {
+            Ok(img) => img,
+            Err(e) => {
+                log::error!("Failed to load image: {}", e);
+                return Err(e.to_string());
+            }
+        };
+        let (width, height) = img.dimensions();
+        let format = TextureFormat::Rgba8;
+        let data = img.as_bytes().to_vec();
+        Ok(TextureData {
+            width,
+            height,
+            format,
+            data,
+        })
     }
 
     pub fn get(&self, handle: &TextureHandle) -> Option<&TextureData> {

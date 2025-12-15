@@ -1,4 +1,5 @@
 use rust_engine::core;
+use rust_engine::core::ConfigContainer;
 use rust_engine::core::TextureManager;
 use rust_engine::platform::PollResult;
 use rust_engine::platform::WinitBackend;
@@ -12,8 +13,15 @@ fn main() {
 
     // TextureManager をセットアップ
     {
-        let di = app.get_di_container();
-        di.insert(TextureManager::new());
+        app.get_di_container()
+            .insert(ConfigContainer::new("conf/config.toml"));
+    }
+    {
+        let config = {
+            let config = app.get_di_container().get::<ConfigContainer>().unwrap();
+            config.get_config()
+        };
+        app.get_di_container().insert(TextureManager::new(config));
     }
 
     // テクスチャをロードしてスプライトエンティティを作成
@@ -29,7 +37,7 @@ fn setup_sprites(app: &mut core::app::App) {
         let mgr = di
             .get_mut::<TextureManager>()
             .expect("TextureManager not found");
-        mgr.load("assets/player.png")
+        mgr.load("assets/tex1.png").unwrap()
     };
 
     let world = app.get_world();

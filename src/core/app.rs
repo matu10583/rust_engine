@@ -2,6 +2,9 @@ use crate::core::ecs;
 use crate::core::plugin::Plugin;
 use crate::core::schedule::{Schedule, Stage};
 use crate::core::{DiContainer, Time, TimeFixed, TimeState};
+use std::sync::Arc;
+
+use crate::core::config::{Config, ConfigContainer};
 
 pub struct App {
     // App implementation
@@ -17,6 +20,8 @@ impl App {
         let mut dicontainer = DiContainer::new();
         dicontainer.insert(Time::default());
         dicontainer.insert(TimeFixed::new(1.0 / 60.0)); // 固定更新用の時間間隔を追加
+                                                        // Insert default ConfigContainer (empty config)
+        dicontainer.insert(ConfigContainer::new("conf/config.toml"));
         Self {
             dicontainer: dicontainer,
             world: ecs::World::new(),
@@ -120,5 +125,12 @@ impl App {
         // 固定更新ロジック（必要に応じて実装）
         self.schedule
             .run_stage(Stage::FixedUpdate, &mut self.dicontainer, &mut self.world);
+    }
+
+    /// Get a reference to the loaded Config.
+    pub fn get_config(&self) -> Option<Arc<Config>> {
+        self.dicontainer
+            .get::<ConfigContainer>()
+            .map(|c| c.get_config())
     }
 }
