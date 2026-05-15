@@ -138,3 +138,9 @@ impl WinitBackend {
         }
     }
 }
+
+impl Default for WinitBackend {
+    fn default() -> Self {
+        Self::new()
+    }
+}

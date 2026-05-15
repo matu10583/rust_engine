@@ -133,6 +133,12 @@ impl Schedule {
     }
 }
 
+impl Default for Schedule {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 // Generic flush system for Events<T>.
 // Register with: app.add_system(Stage::LateUpdate, Priority::Normal, crate::core::schedule::flush_events::<YourEvent>);
 pub fn flush_events<T: 'static + Send + Sync>(di: &mut DiContainer, _world: &mut ecs::World) {

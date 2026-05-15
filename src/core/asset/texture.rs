@@ -49,7 +49,7 @@ impl TextureManager {
             textures: HashMap::new(),
             path_cache: HashMap::new(),
             next_id: 1,
-            config: config,
+            config,
         }
     }
 
@@ -92,7 +92,7 @@ impl TextureManager {
     }
 
     pub fn unload(&mut self, handle: TextureHandle) {
-        if let Some(_) = self.textures.remove(&handle.id) {
+        if self.textures.remove(&handle.id).is_some() {
             // 必要に応じて追加のクリーンアップ処理をここで行う
         }
     }

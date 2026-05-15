@@ -14,6 +14,12 @@ impl InputPlugin {
     }
 }
 
+impl Default for InputPlugin {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Plugin for InputPlugin {
     fn build(&self, app: &mut App) {
         fn input_system(di: &mut DiContainer, _world: &mut crate::core::ecs::World) {

@@ -12,6 +12,12 @@ impl Render2D {
     }
 }
 
+impl Default for Render2D {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Plugin for Render2D {
     fn build(&self, app: &mut App) {
         app.add_event(RenderQueue::new(), Stage::PreRender, Priority::Normal);
@@ -56,7 +62,7 @@ fn collect_sprite(_world: &mut crate::core::ecs::World, _cmds: &mut Vec<RenderCo
         // エンティティごとに Transform と Sprite を使って描画コマンドを生成します。
         let cmd = RenderCommand::DrawSprite {
             sprite: sprite.clone(),
-            transform: transform.clone(),
+            transform: *transform,
         };
         _cmds.push(cmd);
     }

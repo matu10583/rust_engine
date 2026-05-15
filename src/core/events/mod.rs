@@ -60,3 +60,9 @@ impl<T> Events<T> {
         }
     }
 }
+
+impl<T> Default for Events<T> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
