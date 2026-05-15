@@ -1,0 +1,21 @@
+{
+  "name": "rust_engine",
+  "dockerComposeFile": "../docker-compose.yml",
+  "service": "dev",
+  "workspaceFolder": "/workspace",
+  "shutdownAction": "stopCompose",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "rust-lang.rust-analyzer",
+        "vadimcn.vscode-lldb"
+      ],
+      "settings": {
+        "rust-analyzer.check.command": "clippy",
+        "debug.inlineValues": "off",
+        "debug.evaluateOnHover": "off"
+      }
+    }
+  },
+  "postCreateCommand": "cargo fetch"
+}
