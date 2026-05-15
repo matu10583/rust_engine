@@ -1,12 +1,12 @@
 use serde::Deserialize;
 use std::sync::Arc;
 use toml;
-#[derive(Deserialize, Clone, Debug)]
+#[derive(Deserialize, Clone, Debug, Default)]
 pub struct Paths {
     pub texture_dir: Option<String>,
 }
 
-#[derive(Deserialize, Clone, Debug)]
+#[derive(Deserialize, Clone, Debug, Default)]
 pub struct Config {
     pub paths: Option<Paths>,
 }
@@ -22,6 +22,12 @@ pub struct ConfigContainer {
 }
 
 impl ConfigContainer {
+    pub fn empty() -> Self {
+        Self {
+            config: Arc::new(Config::default()),
+        }
+    }
+
     pub fn new(path: &str) -> Self {
         let config = Self::load_file(path).unwrap();
         Self {

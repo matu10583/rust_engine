@@ -5,6 +5,12 @@ mod dicontainer_impl {
         map: std::collections::HashMap<std::any::TypeId, Box<dyn std::any::Any + Send + Sync>>,
     }
 
+    impl Default for DiContainer {
+        fn default() -> Self {
+            Self::new()
+        }
+    }
+
     impl DiContainer {
         pub fn new() -> Self {
             Self {

@@ -1,3 +1,4 @@
+#[allow(clippy::module_inception)]
 pub mod render;
 pub use render::NullRenderer;
 pub mod render2d;

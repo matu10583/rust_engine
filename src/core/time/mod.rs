@@ -37,7 +37,13 @@ impl TimeState {
         self.last_instant = now;
         self.time.elapsed_seconds += delta;
         self.time.delta_seconds = delta;
-        self.time.clone()
+        self.time
+    }
+}
+
+impl Default for TimeState {
+    fn default() -> Self {
+        Self::new()
     }
 }
 

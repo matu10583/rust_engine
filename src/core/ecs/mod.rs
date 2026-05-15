@@ -10,6 +10,12 @@ mod hecs_impl {
     pub struct RefMut<'a, T: ?Sized>(h::RefMut<'a, T>);
 
     impl<T: Send + Sync + 'static> Component for T {}
+    impl Default for World {
+        fn default() -> Self {
+            Self::new()
+        }
+    }
+
     impl World {
         pub fn new() -> Self {
             Self(h::World::new())
@@ -30,7 +36,7 @@ mod hecs_impl {
             self.0.remove_one::<T>(entity.0).ok()
         }
 
-        pub fn get<'a, T: Component>(&self, entity: Entity) -> Option<Ref<'_, T>> {
+        pub fn get<T: Component>(&self, entity: Entity) -> Option<Ref<'_, T>> {
             self.0.get::<&T>(entity.0).ok().map(Ref)
         }
 

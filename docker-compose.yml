@@ -1,0 +1,20 @@
+services:
+  dev:
+    build:
+      context: .
+    working_dir: /workspace
+    volumes:
+      - .:/workspace
+      - cargo-registry:/usr/local/cargo/registry
+      - cargo-git:/usr/local/cargo/git
+      - target:/workspace/target
+    environment:
+      CARGO_TERM_COLOR: always
+      RUST_BACKTRACE: "1"
+    stdin_open: true
+    tty: true
+
+volumes:
+  cargo-registry:
+  cargo-git:
+  target:

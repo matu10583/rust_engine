@@ -10,6 +10,12 @@ impl NullRenderer {
     }
 }
 
+impl Default for NullRenderer {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Plugin for NullRenderer {
     fn build(&self, app: &mut App) {
         fn render_system(_di: &mut crate::core::DiContainer, _world: &mut crate::core::ecs::World) {

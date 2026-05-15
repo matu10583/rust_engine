@@ -20,10 +20,9 @@ impl App {
         let mut dicontainer = DiContainer::new();
         dicontainer.insert(Time::default());
         dicontainer.insert(TimeFixed::new(1.0 / 60.0)); // 固定更新用の時間間隔を追加
-                                                        // Insert default ConfigContainer (empty config)
-        dicontainer.insert(ConfigContainer::new("conf/config.toml"));
+        dicontainer.insert(ConfigContainer::empty());
         Self {
-            dicontainer: dicontainer,
+            dicontainer,
             world: ecs::World::new(),
             timer_state: TimeState::new(),
             schedule: Schedule::new(),
@@ -132,5 +131,11 @@ impl App {
         self.dicontainer
             .get::<ConfigContainer>()
             .map(|c| c.get_config())
+    }
+}
+
+impl Default for App {
+    fn default() -> Self {
+        Self::new()
     }
 }
