@@ -59,7 +59,7 @@ fn texture_manager_load_and_get() {
     env.create_texture("assets/test.png", 1024, 1024);
 
     let config = env.config();
-    let mut mgr = TextureManager::new(config.get_config());
+    let mut mgr = TextureManager::new(config.get_config().texture_config());
 
     // テクスチャをロード
     let handle = mgr.load("assets/test.png").unwrap();
@@ -80,7 +80,7 @@ fn texture_manager_duplicate_load_returns_same_handle() {
     env.create_texture("assets/tex1.png", 16, 16);
 
     let config = env.config();
-    let mut mgr = TextureManager::new(config.get_config());
+    let mut mgr = TextureManager::new(config.get_config().texture_config());
 
     let h1 = mgr.load("assets/tex1.png").unwrap();
     let h2 = mgr.load("assets/tex1.png").unwrap();
@@ -96,7 +96,7 @@ fn texture_manager_unload() {
     env.create_texture("assets/tex1.png", 16, 16);
 
     let config = env.config();
-    let mut mgr = TextureManager::new(config.get_config());
+    let mut mgr = TextureManager::new(config.get_config().texture_config());
 
     let handle = mgr.load("assets/tex1.png").unwrap();
     assert_eq!(mgr.loaded_count(), 1);
@@ -115,7 +115,7 @@ fn texture_handle_invalid() {
 
     let env = TextureTestEnv::new("invalid_handle");
     let config = env.config();
-    let mgr = TextureManager::new(config.get_config());
+    let mgr = TextureManager::new(config.get_config().texture_config());
     assert!(mgr.get(&invalid).is_none());
 }
 
@@ -127,7 +127,7 @@ fn texture_manager_multiple_textures() {
     env.create_texture("assets/tex3.png", 16, 32);
 
     let config = env.config();
-    let mut mgr = TextureManager::new(config.get_config());
+    let mut mgr = TextureManager::new(config.get_config().texture_config());
 
     let h1 = mgr.load("assets/tex1.png").unwrap();
     let h2 = mgr.load("assets/tex2.png").unwrap();

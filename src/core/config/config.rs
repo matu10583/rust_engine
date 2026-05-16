@@ -1,9 +1,13 @@
 use serde::Deserialize;
 use std::path::Path;
-use std::sync::Arc;
 use toml;
 #[derive(Deserialize, Clone, Debug, Default)]
 pub struct Paths {
+    pub texture_dir: Option<String>,
+}
+
+#[derive(Clone, Debug, Default)]
+pub struct TextureConfig {
     pub texture_dir: Option<String>,
 }
 
@@ -13,13 +17,18 @@ pub struct Config {
 }
 
 impl Config {
-    pub fn get_texture_dir(&self) -> Option<String> {
-        self.paths.as_ref().unwrap().texture_dir.clone()
+    pub fn texture_config(&self) -> TextureConfig {
+        TextureConfig {
+            texture_dir: self
+                .paths
+                .as_ref()
+                .and_then(|paths| paths.texture_dir.clone()),
+        }
     }
 }
 
 pub struct ConfigContainer {
-    config: Arc<Config>,
+    config: Config,
 }
 
 impl ConfigContainer {
@@ -28,9 +37,7 @@ impl ConfigContainer {
     }
 
     pub fn from_config(config: Config) -> Self {
-        Self {
-            config: Arc::new(config),
-        }
+        Self { config }
     }
 
     pub fn load_from_file(path: impl AsRef<Path>) -> Result<Self, String> {
@@ -49,7 +56,7 @@ impl ConfigContainer {
         }
     }
 
-    pub fn get_config(&self) -> Arc<Config> {
+    pub fn get_config(&self) -> Config {
         self.config.clone()
     }
 }

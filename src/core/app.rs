@@ -2,7 +2,6 @@ use crate::core::ecs;
 use crate::core::plugin::Plugin;
 use crate::core::schedule::{Schedule, Stage};
 use crate::core::{DiContainer, Time, TimeFixed, TimeState};
-use std::sync::Arc;
 
 use crate::core::config::{Config, ConfigContainer};
 
@@ -127,7 +126,7 @@ impl App {
     }
 
     /// Get a reference to the loaded Config.
-    pub fn get_config(&self) -> Option<Arc<Config>> {
+    pub fn get_config(&self) -> Option<Config> {
         self.dicontainer
             .get::<ConfigContainer>()
             .map(|c| c.get_config())

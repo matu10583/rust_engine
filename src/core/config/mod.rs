@@ -1,3 +1,3 @@
 #[allow(clippy::module_inception)]
 mod config;
-pub use config::{Config, ConfigContainer};
+pub use config::{Config, ConfigContainer, TextureConfig};

@@ -1,7 +1,6 @@
-use crate::core::config::Config;
+use crate::core::config::TextureConfig;
 use image::GenericImageView;
 use std::collections::HashMap;
-use std::sync::Arc;
 
 type TextureId = u32;
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -40,11 +39,11 @@ pub struct TextureManager {
     textures: HashMap<TextureId, TextureData>,
     path_cache: HashMap<String, TextureHandle>,
     next_id: TextureId,
-    config: Arc<Config>,
+    config: TextureConfig,
 }
 
 impl TextureManager {
-    pub fn new(config: Arc<Config>) -> Self {
+    pub fn new(config: TextureConfig) -> Self {
         Self {
             textures: HashMap::new(),
             path_cache: HashMap::new(),
@@ -59,7 +58,12 @@ impl TextureManager {
         }
         let id = self.next_id;
         self.next_id += 1;
-        let full_path = self.config.get_texture_dir().unwrap() + path;
+        let texture_dir = self
+            .config
+            .texture_dir
+            .as_deref()
+            .ok_or_else(|| "texture_dir is not configured".to_string())?;
+        let full_path = texture_dir.to_string() + path;
         let data = self._load_impl(&full_path)?;
         self.textures.insert(id, data);
         let handle = TextureHandle { id };

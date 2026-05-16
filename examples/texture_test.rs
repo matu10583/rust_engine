@@ -21,7 +21,7 @@ fn main() {
     {
         let config = {
             let config = app.get_di_container().get::<ConfigContainer>().unwrap();
-            config.get_config()
+            config.get_config().texture_config()
         };
         app.get_di_container().insert(TextureManager::new(config));
     }
