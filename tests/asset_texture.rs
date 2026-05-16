@@ -34,7 +34,7 @@ impl TextureTestEnv {
     }
 
     fn config(&self) -> ConfigContainer {
-        ConfigContainer::new(self.config_path.to_str().unwrap())
+        ConfigContainer::load_from_file(&self.config_path).unwrap()
     }
 
     fn create_texture(&self, relative_path: &str, width: u32, height: u32) {

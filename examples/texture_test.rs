@@ -13,8 +13,10 @@ fn main() {
 
     // TextureManager をセットアップ
     {
-        app.get_di_container()
-            .insert(ConfigContainer::new("conf/config.toml"));
+        app.get_di_container().insert(
+            ConfigContainer::load_from_file("conf/config.toml")
+                .expect("failed to load conf/config.toml"),
+        );
     }
     {
         let config = {

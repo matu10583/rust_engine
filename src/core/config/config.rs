@@ -1,4 +1,5 @@
 use serde::Deserialize;
+use std::path::Path;
 use std::sync::Arc;
 use toml;
 #[derive(Deserialize, Clone, Debug, Default)]
@@ -23,22 +24,23 @@ pub struct ConfigContainer {
 
 impl ConfigContainer {
     pub fn empty() -> Self {
-        Self {
-            config: Arc::new(Config::default()),
-        }
+        Self::from_config(Config::default())
     }
 
-    pub fn new(path: &str) -> Self {
-        let config = Self::load_file(path).unwrap();
+    pub fn from_config(config: Config) -> Self {
         Self {
             config: Arc::new(config),
         }
     }
 
-    fn load_file(path: &str) -> Result<Config, String> {
-        let mut file = std::fs::File::open(path).unwrap();
+    pub fn load_from_file(path: impl AsRef<Path>) -> Result<Self, String> {
+        Self::load_file(path).map(Self::from_config)
+    }
+
+    fn load_file(path: impl AsRef<Path>) -> Result<Config, String> {
+        let mut file = std::fs::File::open(path).map_err(|e| e.to_string())?;
         let mut contents = String::new();
-        std::io::Read::read_to_string(&mut file, &mut contents).unwrap();
+        std::io::Read::read_to_string(&mut file, &mut contents).map_err(|e| e.to_string())?;
         let config: Result<Config, toml::de::Error> = toml::from_str(&contents);
 
         match config {
