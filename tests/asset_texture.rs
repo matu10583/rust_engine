@@ -1,5 +1,5 @@
 use rust_engine::core::config::ConfigContainer;
-use rust_engine::core::{TextureFormat, TextureHandle, TextureManager};
+use rust_engine::core::{TextureError, TextureFormat, TextureHandle, TextureManager};
 use std::path::PathBuf;
 use std::time::{SystemTime, UNIX_EPOCH};
 
@@ -142,4 +142,23 @@ fn texture_manager_multiple_textures() {
     assert!(mgr.get(&h1).is_some());
     assert!(mgr.get(&h2).is_some());
     assert!(mgr.get(&h3).is_some());
+}
+
+#[test]
+fn config_load_missing_file_returns_error() {
+    let missing_path = std::env::temp_dir().join("rust_engine_missing_config_for_test.toml");
+
+    let err = match ConfigContainer::load_from_file(&missing_path) {
+        Ok(_) => panic!("missing config file should fail"),
+        Err(err) => err,
+    };
+    assert!(err.to_string().contains("failed to read config file"));
+}
+
+#[test]
+fn texture_manager_missing_texture_dir_returns_error() {
+    let mut mgr = TextureManager::new(Default::default());
+
+    let err = mgr.load("assets/test.png").unwrap_err();
+    assert!(matches!(err, TextureError::MissingTextureDir));
 }
