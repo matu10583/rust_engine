@@ -15,6 +15,6 @@ pub use ecs::{Component, Entity, World};
 pub mod time;
 pub use time::{Time, TimeFixed, TimeState};
 pub mod asset;
-pub use asset::{TextureData, TextureFormat, TextureHandle, TextureManager};
+pub use asset::{TextureData, TextureError, TextureFormat, TextureHandle, TextureManager};
 pub mod config;
 pub use config::ConfigContainer;

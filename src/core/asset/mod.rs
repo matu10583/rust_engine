@@ -1,2 +1,2 @@
 mod texture;
-pub use texture::{TextureData, TextureFormat, TextureHandle, TextureManager};
+pub use texture::{TextureData, TextureError, TextureFormat, TextureHandle, TextureManager};

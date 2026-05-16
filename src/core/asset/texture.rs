@@ -1,6 +1,19 @@
 use crate::core::config::TextureConfig;
 use image::GenericImageView;
 use std::collections::HashMap;
+use std::path::PathBuf;
+use thiserror::Error;
+
+#[derive(Debug, Error)]
+pub enum TextureError {
+    #[error("texture_dir is not configured")]
+    MissingTextureDir,
+    #[error("failed to load texture: {path}")]
+    LoadImage {
+        path: PathBuf,
+        source: image::ImageError,
+    },
+}
 
 type TextureId = u32;
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -52,7 +65,7 @@ impl TextureManager {
         }
     }
 
-    pub fn load(&mut self, path: &str) -> Result<TextureHandle, String> {
+    pub fn load(&mut self, path: &str) -> Result<TextureHandle, TextureError> {
         if let Some(handle) = self.path_cache.get(path) {
             return Ok(*handle);
         }
@@ -62,7 +75,7 @@ impl TextureManager {
             .config
             .texture_dir
             .as_deref()
-            .ok_or_else(|| "texture_dir is not configured".to_string())?;
+            .ok_or(TextureError::MissingTextureDir)?;
         let full_path = texture_dir.to_string() + path;
         let data = self._load_impl(&full_path)?;
         self.textures.insert(id, data);
@@ -71,13 +84,16 @@ impl TextureManager {
         Ok(handle)
     }
 
-    fn _load_impl(&mut self, _path: &str) -> Result<TextureData, String> {
+    fn _load_impl(&mut self, path: &str) -> Result<TextureData, TextureError> {
         // ここで実際のファイル読み込みとデコードを行う
-        let img = match image::open(_path) {
+        let img = match image::open(path) {
             Ok(img) => img,
-            Err(e) => {
-                log::error!("Failed to load image: {}", e);
-                return Err(e.to_string());
+            Err(source) => {
+                log::error!("Failed to load image: {}", source);
+                return Err(TextureError::LoadImage {
+                    path: PathBuf::from(path),
+                    source,
+                });
             }
         };
         let (width, height) = img.dimensions();

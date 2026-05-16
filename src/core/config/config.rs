@@ -1,6 +1,22 @@
 use serde::Deserialize;
-use std::path::Path;
+use std::path::{Path, PathBuf};
+use thiserror::Error;
 use toml;
+
+#[derive(Debug, Error)]
+pub enum ConfigError {
+    #[error("failed to read config file: {path}")]
+    ReadFile {
+        path: PathBuf,
+        source: std::io::Error,
+    },
+    #[error("failed to parse config file: {path}")]
+    ParseToml {
+        path: PathBuf,
+        source: toml::de::Error,
+    },
+}
+
 #[derive(Deserialize, Clone, Debug, Default)]
 pub struct Paths {
     pub texture_dir: Option<String>,
@@ -40,20 +56,27 @@ impl ConfigContainer {
         Self { config }
     }
 
-    pub fn load_from_file(path: impl AsRef<Path>) -> Result<Self, String> {
+    pub fn load_from_file(path: impl AsRef<Path>) -> Result<Self, ConfigError> {
         Self::load_file(path).map(Self::from_config)
     }
 
-    fn load_file(path: impl AsRef<Path>) -> Result<Config, String> {
-        let mut file = std::fs::File::open(path).map_err(|e| e.to_string())?;
+    fn load_file(path: impl AsRef<Path>) -> Result<Config, ConfigError> {
+        let path = path.as_ref();
+        let mut file = std::fs::File::open(path).map_err(|source| ConfigError::ReadFile {
+            path: path.to_path_buf(),
+            source,
+        })?;
         let mut contents = String::new();
-        std::io::Read::read_to_string(&mut file, &mut contents).map_err(|e| e.to_string())?;
-        let config: Result<Config, toml::de::Error> = toml::from_str(&contents);
-
-        match config {
-            Ok(config) => Ok(config),
-            Err(e) => Err(e.to_string()),
-        }
+        std::io::Read::read_to_string(&mut file, &mut contents).map_err(|source| {
+            ConfigError::ReadFile {
+                path: path.to_path_buf(),
+                source,
+            }
+        })?;
+        toml::from_str(&contents).map_err(|source| ConfigError::ParseToml {
+            path: path.to_path_buf(),
+            source,
+        })
     }
 
     pub fn get_config(&self) -> Config {
