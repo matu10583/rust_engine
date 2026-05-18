@@ -7,6 +7,12 @@ use winit::event_loop::{ControlFlow, EventLoop};
 use winit::platform::run_return::EventLoopExtRunReturn;
 use winit::window::WindowBuilder;
 
+#[derive(Debug, thiserror::Error)]
+pub enum WinitError {
+    #[error("failed to create window")]
+    WindowCreation(#[from] winit::error::OsError),
+}
+
 pub struct WinitBackend {
     event_loop: EventLoop<()>,
     window: winit::window::Window,
@@ -20,19 +26,18 @@ pub enum PollResult {
     Continue,
 }
 impl WinitBackend {
-    pub fn new() -> Self {
+    pub fn try_new() -> Result<Self, WinitError> {
         let event_loop = EventLoop::new();
         let window = WindowBuilder::new()
             .with_title("Rust Engine")
-            .build(&event_loop)
-            .unwrap();
+            .build(&event_loop)?;
 
-        WinitBackend {
+        Ok(WinitBackend {
             event_loop,
             window,
             accumulator: Duration::ZERO,
             last_instant: Instant::now(),
-        }
+        })
     }
 
     pub fn poll_once(&mut self, app: &mut App) -> PollResult {
@@ -138,11 +143,5 @@ impl WinitBackend {
         } else {
             PollResult::Continue
         }
-    }
-}
-
-impl Default for WinitBackend {
-    fn default() -> Self {
-        Self::new()
     }
 }
