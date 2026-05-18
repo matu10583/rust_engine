@@ -10,6 +10,10 @@ struct TextureTestEnv {
 
 impl TextureTestEnv {
     fn new(name: &str) -> Self {
+        Self::new_with_trailing_separator(name, true)
+    }
+
+    fn new_with_trailing_separator(name: &str, trailing_separator: bool) -> Self {
         let unique = SystemTime::now()
             .duration_since(UNIX_EPOCH)
             .unwrap()
@@ -23,7 +27,11 @@ impl TextureTestEnv {
         std::fs::create_dir_all(texture_root.join("assets")).unwrap();
 
         let config_path = root.join("config.toml");
-        let texture_dir = format!("{}/", texture_root.display());
+        let texture_dir = if trailing_separator {
+            format!("{}/", texture_root.display())
+        } else {
+            texture_root.display().to_string()
+        };
         std::fs::write(
             &config_path,
             format!("[paths]\ntexture_dir = \"{}\"\n", texture_dir),
@@ -88,6 +96,18 @@ fn texture_manager_duplicate_load_returns_same_handle() {
     // 同じパスをロードしたら同じハンドルが返る（キャッシュ）
     assert_eq!(h1, h2);
     assert_eq!(mgr.loaded_count(), 1);
+}
+
+#[test]
+fn texture_manager_loads_when_texture_dir_has_no_trailing_separator() {
+    let env = TextureTestEnv::new_with_trailing_separator("no_trailing_separator", false);
+    env.create_texture("assets/tex1.png", 16, 16);
+
+    let config = env.config();
+    let mut mgr = TextureManager::new(config.get_config().texture_config());
+
+    let handle = mgr.load("assets/tex1.png").unwrap();
+    assert!(handle.is_valid());
 }
 
 #[test]
