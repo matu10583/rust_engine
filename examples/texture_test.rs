@@ -5,7 +5,7 @@ use rust_engine::platform::PollResult;
 use rust_engine::platform::WinitBackend;
 use rust_engine::{InputPlugin, Sprite, Transform2D};
 
-fn main() {
+fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut app = core::app::App::new();
     app.startup();
     app.set_fixed_dt(1.0 / 60.0);
@@ -29,8 +29,10 @@ fn main() {
     // テクスチャをロードしてスプライトエンティティを作成
     setup_sprites(&mut app);
 
-    let mut winit_backend = WinitBackend::new();
+    let mut winit_backend = WinitBackend::try_new()?;
     while winit_backend.poll_once(&mut app) != PollResult::Exit {}
+
+    Ok(())
 }
 
 fn setup_sprites(app: &mut core::app::App) {
