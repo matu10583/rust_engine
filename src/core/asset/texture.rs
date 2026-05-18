@@ -1,7 +1,7 @@
 use crate::core::config::TextureConfig;
 use image::GenericImageView;
 use std::collections::HashMap;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use thiserror::Error;
 
 #[derive(Debug, Error)]
@@ -76,7 +76,7 @@ impl TextureManager {
             .texture_dir
             .as_deref()
             .ok_or(TextureError::MissingTextureDir)?;
-        let full_path = texture_dir.to_string() + path;
+        let full_path = Path::new(texture_dir).join(path);
         let data = self._load_impl(&full_path)?;
         self.textures.insert(id, data);
         let handle = TextureHandle { id };
@@ -84,14 +84,14 @@ impl TextureManager {
         Ok(handle)
     }
 
-    fn _load_impl(&mut self, path: &str) -> Result<TextureData, TextureError> {
+    fn _load_impl(&mut self, path: &Path) -> Result<TextureData, TextureError> {
         // ここで実際のファイル読み込みとデコードを行う
         let img = match image::open(path) {
             Ok(img) => img,
             Err(source) => {
                 log::error!("Failed to load image: {}", source);
                 return Err(TextureError::LoadImage {
-                    path: PathBuf::from(path),
+                    path: path.to_path_buf(),
                     source,
                 });
             }
