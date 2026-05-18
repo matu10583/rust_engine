@@ -85,14 +85,16 @@ impl WinitBackend {
                 winit::event::Event::WindowEvent { event, .. } => match event {
                     winit::event::WindowEvent::KeyboardInput { input, .. } => {
                         // キーボード入力処理
-                        if let Some(ev_queue) = app
-                            .get_di_container()
-                            .get_mut::<Events<KeyboardInputEvent>>()
-                        {
-                            ev_queue.send(KeyboardInputEvent {
-                                key: EngineKey::from(input.virtual_keycode.unwrap()),
-                                state: input.state.into(),
-                            });
+                        if let Some(keycode) = input.virtual_keycode {
+                            if let Some(ev_queue) = app
+                                .get_di_container()
+                                .get_mut::<Events<KeyboardInputEvent>>()
+                            {
+                                ev_queue.send(KeyboardInputEvent {
+                                    key: EngineKey::from(keycode),
+                                    state: input.state.into(),
+                                });
+                            }
                         }
                     }
                     winit::event::WindowEvent::MouseInput { button, state, .. } => {
